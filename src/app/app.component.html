@@ -1,0 +1,26 @@
+<div class="container py-5">
+  <h2>Observable Length: {{categoriesLength}}</h2>
+
+  <div class="row py-5 g-3">
+    <div class="col-md-6">
+      <form [formGroup]="categoryForm">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" formControlName="categoryName"
+                 name="categoryName" placeholder="Category">
+        </div>
+        <button type="button" class="btn btn-primary" (click)="addCategory()">Add</button>
+      </form>
+
+      <ul class="list-group py-5">
+        <div *ngFor="let category of categories$">
+          <li class="list-group-item">{{ category.categoryID }}{{ category.categoryName }}</li>
+        </div>
+      </ul>
+
+      <div class="pt-1">
+        <pre>{{categories$ | json }}</pre>
+      </div>
+
+    </div>
+  </div>
+</div>
