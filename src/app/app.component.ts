@@ -1,59 +1,58 @@
-import {Component, OnInit} from '@angular/core';
-import {CategoryService} from "./services/category.service";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {Observable} from "rxjs";
-import {Category} from "./models/category";
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { CategoryService } from "./services/category.service";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Observable, of, tap } from "rxjs";
+import { Category } from "./models/category";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
-
-
-  // categories$: Observable<Category[]> | undefined;
-  categories$: Category[] | undefined;
-
-  categoriesLength: number | undefined;
-
+  categories$: Observable<Category[]> = of([]);
   categoryForm!: FormGroup;
 
-  constructor(private categoryService: CategoryService,
-              private formBuilder: FormBuilder) {
+  constructor(
+    private categoryService: CategoryService,
+    private formBuilder: FormBuilder
+    ) {
   }
 
   ngOnInit() {
     this.loadProductCategory();
-    console.log(this.categoriesLength);
-    this.buildCategoryForm();
   }
 
-  private loadProductCategory() {
-    // this.categories$ = this.categoryService.getAllCategories();
-
-    this.categoryService.getAllCategories().subscribe(category => {
-      this.categories$ = category;
-      this.categoriesLength = category.length;
-      console.log(this.categoriesLength);
-    });
+  loadProductCategory(): void {
+    this.categories$ = this.categoryService.getAllCategories()
+      .pipe(
+        tap(
+          category => {
+            this.buildCategoryForm(category.length);
+          }
+        )
+      );
   }
 
-
-  private buildCategoryForm(): void {
+  buildCategoryForm(categoriesLength: number): void {    
     this.categoryForm = this.formBuilder.group({
-      // categoryID: [this.categoriesLength],
-      categoryID: [this.categoriesLength], // here I want to use this value this.categoriesLength to add it to the database
+      categoryID: [categoriesLength],
       categoryName: ['', {
         validators: [
-          Validators.required, Validators.minLength(3), Validators.maxLength(15)]
+          Validators.required, 
+          Validators.minLength(3), 
+          Validators.maxLength(15)]
       }],
     });
   }
 
-  addCategory() {
-    this.categoryService.addCategory(this.categoryForm.value).then(() => {
-      console.log('ok')
+
+  // TODO: move to service
+  addCategory(): void {
+    this.categoryService.addCategory(this.categoryForm.value)
+    .then((response) => {
+      console.log('addCategory:response: ', response)
     }).catch(e => console.log(e));
   }
 }
