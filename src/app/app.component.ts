@@ -1,49 +1,44 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {CategoryService} from "./services/category.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {Observable} from "rxjs";
 import {Category} from "./models/category";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
 
 
-  // categories$: Observable<Category[]> | undefined;
   categories$: Category[] | undefined;
-
   categoriesLength: number | undefined;
 
   categoryForm!: FormGroup;
+
+  categorySubscription!: Subscription
 
   constructor(private categoryService: CategoryService,
               private formBuilder: FormBuilder) {
   }
 
   ngOnInit() {
-    this.loadProductCategory();
-    console.log(this.categoriesLength);
     this.buildCategoryForm();
+    this.loadProductCategory();
   }
 
   private loadProductCategory() {
-    // this.categories$ = this.categoryService.getAllCategories();
-
-    this.categoryService.getAllCategories().subscribe(category => {
+    this.categorySubscription = this.categoryService.getAllCategories().subscribe(category => {
       this.categories$ = category;
       this.categoriesLength = category.length;
-      console.log(this.categoriesLength);
+      this.categoryFormUpdate(category.length)
     });
   }
 
-
   private buildCategoryForm(): void {
     this.categoryForm = this.formBuilder.group({
-      // categoryID: [this.categoriesLength],
-      categoryID: [this.categoriesLength], // here I want to use this value this.categoriesLength to add it to the database
+      categoryID: [0],
       categoryName: ['', {
         validators: [
           Validators.required, Validators.minLength(3), Validators.maxLength(15)]
@@ -51,9 +46,25 @@ export class AppComponent implements OnInit {
     });
   }
 
+  get categoryID() {
+    return this.categoryForm.controls['categoryID'];
+  }
+
+  private categoryFormUpdate(categoriesLength: number): void {
+    this.categoryID.setValue(categoriesLength + 1);
+  }
+
   addCategory() {
     this.categoryService.addCategory(this.categoryForm.value).then(() => {
       console.log('ok')
     }).catch(e => console.log(e));
+  }
+
+  deleteCategory(key: string) {
+    this.categoryService.removeCategory(key).then();
+  }
+
+  ngOnDestroy() {
+    this.categorySubscription.unsubscribe();
   }
 }

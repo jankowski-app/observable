@@ -29,4 +29,9 @@ export class CategoryService {
     return this.fireBase.list<Category>(this.firebaseURL).push(category);
   }
 
+  // delete category from firebase
+  removeCategory(key: string) {
+    return this.fireBase.list(this.firebaseURL).remove(key);
+  }
+
 }

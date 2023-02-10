@@ -1,5 +1,5 @@
 <div class="container py-5">
-  <h2>Observable Length: {{categoriesLength}}</h2>
+  <h2>Observable Length: {{ categoriesLength }}</h2>
 
   <div class="row py-5 g-3">
     <div class="col-md-6">
@@ -13,7 +13,10 @@
 
       <ul class="list-group py-5">
         <div *ngFor="let category of categories$">
-          <li class="list-group-item">{{ category.categoryID }}{{ category.categoryName }}</li>
+          <li class="list-group-item">{{ category.categoryID }} {{ category.categoryName }}
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="deleteCategory(category.key)">Del
+            </button>
+          </li>
         </div>
       </ul>
 
