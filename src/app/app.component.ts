@@ -11,7 +11,7 @@ import { Category } from "./models/category";
   changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
-  categories$: Observable<Category[]>  = of([]);
+  categories$: Observable<Category[]> = of([]);
   categoryForm!: FormGroup;
 
   constructor(
@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
     this.loadProductCategory();
   }
 
-  private loadProductCategory() {
+  loadProductCategory(): void {
     this.categories$ = this.categoryService.getAllCategories()
       .pipe(
         tap(
@@ -35,7 +35,7 @@ export class AppComponent implements OnInit {
       );
   }
 
-  buildCategoryForm(categoriesLength: number): void {
+  buildCategoryForm(categoriesLength: number): void {    
     this.categoryForm = this.formBuilder.group({
       categoryID: [categoriesLength],
       categoryName: ['', {
@@ -49,7 +49,7 @@ export class AppComponent implements OnInit {
 
 
   // TODO: move to service
-  addCategory() {
+  addCategory(): void {
     this.categoryService.addCategory(this.categoryForm.value)
     .then((response) => {
       console.log('addCategory:response: ', response)
